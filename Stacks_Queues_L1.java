@@ -241,4 +241,169 @@ public class Stacks_Queues_L1{
 
     }
 
+  // ================================= THE CELEBRITY PROBLEM ===========================
+    // BRUTEFORECE ( ACCEPTED ON GFG)
+   int celebrity(int M[][], int n)
+    {
+      // code here 
+      int potentialCelebrity = -1;
+      for( int i = 0 ; i < n ; i++){
+          boolean flag = true;
+          for( int j = 0 ; j < n ; j++){
+              if(M[i][j] == 1){
+                  flag = false;
+                  break;
+              }
+          }
+         // System.out.println(isPotentialCelebrity + " " + potentialCelebrity);
+          if(flag == true){
+              potentialCelebrity = i;
+              break;
+          }
+      }
+      if(potentialCelebrity == -1) return -1;
+      for( int i = 0 ; i < n ; i++){
+          if( i != potentialCelebrity){
+             if(M[i][potentialCelebrity] == 0){
+                  return -1;
+             }
+             
+          }
+      }
+      return potentialCelebrity;
+      
+      
+    }  
+
+   // OPTIMISED USING STACK 
+   class Celebrity_Optimised_Using_Stack
+{ 
+    //Function to find if there is a celebrity in the party or not.
+    int potentialCelebrity(int arr[][], int n){
+        Stack<Integer> st = new Stack<>();
+        for( int i = 0 ; i < n ; i++) st.push(i); // pushed all the elements
+        while( st.size() >= 2){
+            // 2 pops so that we can compare
+            int i = st.pop();
+            int j = st.pop();
+            if( arr[i][j] == 1){
+                // i knows j -> i can't be a celebrity so push j 
+                st.push(j);
+            }else{
+                st.push(i);
+            }
+        }
+        int pot = st.pop(); // this could be potential celebrity
+        return pot;
+    }
+    int celebrity(int M[][], int n)
+    {
+      int pot = potentialCelebrity(M, n);
+      // since we have our potential celebrity we just neet to check its column
+      for( int i = 0 ; i < n ; i++){
+          if( i != pot){ // no need to check arr[1][1] because 1 khudko to janta hi h
+             if(M[i][pot] == 0 || M[pot][i] == 1){ // here these conditions are very important because
+             // we have not checked all celles in stack like the brutforce solution
+                  return -1;
+             }
+             
+          }
+      }
+      return pot; 
+      
+    }
+} 
+
+
+// ============================== MERGE INTERVALS(LEETCODE 56) ======================================
+
+class MERGE_INTERVALS {
+    class Pair implements Comparable<Pair>{
+        int st;
+        int et;
+        
+        Pair(int st, int et){
+            this.st = st;
+            this.et = et;
+        }
+        public int compareTo(Pair a){
+            if( this.st != a.st){
+                return this.st - a.st;
+            }else{
+                // if their start time is equal sort acc to end time
+                return this.et - a.et;
+            }
+        }
+    }
+    public int[][] merge(int[][] intervals)
+    {
+        // Creating a pair array
+        int n = intervals.length;
+        Pair[] pairs = new Pair[n];
+        for( int i = 0 ; i < n ; i++){
+            pairs[i] = new Pair(intervals[i][0], intervals[i][1]);
+        }
+        Arrays.sort(pairs);
+        Stack<Pair> st = new Stack<>();
+        st.push(pairs[0]); // pushing first pair
+        for( int i = 1; i < n ; i++){
+            // pop compare and add 
+            Pair p = pairs[i];
+            if( p.st <= st.peek().et){
+                Pair top = st.pop();
+                int newEndTime = Math.max(top.et , p.et);
+                // we need to pop st.peek() because this is new merged interval
+                st.push(new Pair(top.st,newEndTime));
+                
+            }else{
+                st.push(new Pair(p.st,p.et));
+            }
+        }
+        Stack<Pair> ns = new Stack<>();
+        while( st.size() > 0){
+            Pair p = st.pop();
+            ns.push(p);
+        }
+        int[][] arr = new int[ns.size()][2];
+        for( int i = 0 ; i < arr.length ; i++){
+            Pair p = ns.pop();
+            int start = p.st;
+            int end = p.et;
+            arr[i][0] = start;
+            arr[i][1] = end;
+        }
+        return arr;
+        
+        
+    }
+}
+
+
+// =======================(2375)Smallest pattern from DI string=================
+class DI_String_Pattern {
+    public String smallestNumber(String pattern) {
+        int num = 1;
+        String ans = "";
+        Stack<Integer> st =  new Stack<>();
+        for( int i = 0 ; i < pattern.length() ; i++){
+            char ch = pattern.charAt(i);
+            if( ch == 'D'){
+                // push increment 
+                st.push(num);
+                num++;
+            }else{
+                // push increment and empty stack
+                st.push(num);
+                num++;
+                while( st.size() > 0) ans += st.pop();
+            }
+        }
+        st.push(num); // last number will be left
+        while( st.size() > 0) ans += st.pop();
+        return ans;
+    }
+}
+
+
+
 }
