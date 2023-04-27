@@ -2,7 +2,9 @@ import java.util.*;
 public class Stacks_Queues_L1{
 	public static void main(String[] args){
 		Scanner scn = new Scanner(System.in);
-
+     
+     Infix_Evaluation obj = new Infix_Evaluation();
+     System.out.println(obj.Infix_evaluation_ans("2+(5-3*6/2)"));
 	}
 
 // ============================ DUPLICATE BRACKETS ========================
@@ -148,6 +150,95 @@ public class Stacks_Queues_L1{
         }
         
         return maxArea;
+    }
+
+
+    // ==================================== INFIX EVALUTION ========================
+
+    static class Infix_Evaluation{
+      public static int precedence( char operator)
+      {
+        if( operator == '+'){
+             return 1;    
+        }else if(operator == '*'){
+            return 2;
+        }else if(operator == '-'){
+            return 1;
+        }else if(operator == '/'){
+            return 2;
+        }
+        return 0;
+      }
+      public static int operation( int a, int b, char operator)
+      {
+        if( operator == '+'){
+             return a + b;
+        }else if(operator == '*'){
+            return a*b;
+        }else if( operator == '-'){
+          return a-b;
+        }else{
+          return a/b;
+        }
+      }
+
+      public static int Infix_evaluation_ans(String str){
+        Stack<Integer> operands = new Stack<>();
+        Stack<Character> optors = new Stack<>();
+        for(int i  = 0 ; i<str.length() ; i++){
+          char ch = str.charAt(i);
+          if( ch == '('){
+             optors.push(ch);
+          }else if(Character.isDigit(ch) == true){
+             operands.push(ch-'0'); // push the integer value
+          }else if(ch == ')'){
+               // pop till you get opening bracket and evalaute the answer
+            while(optors.peek() != '('){
+              // operator is poped once while two operands are poped
+              char operator = optors.pop();
+              int b = operands.pop();
+              int a = operands.pop();
+
+              int ans = operation(a,b,operator);
+              operands.push(ans);
+
+            }
+            optors.pop(); // for opening bracket
+
+          }else if( ch == '+' || ch == '-' || ch == '/' || ch == '*'){
+            while( optors.size() > 0 && optors.peek() != '(' && precedence(ch) <= precedence(optors.peek())){
+              char operator = optors.pop();
+              int b = operands.pop();
+              int a = operands.pop();
+
+              int ans = operation(a,b,operator);
+              operands.push(ans);
+            }
+               optors.push(ch);
+          }
+         
+        }
+        // there are chances that stack is not empty -> 2 * 3 + 6
+         while(optors.size() != 0){
+              // operator is poped once while two operands are poped
+              char operator = optors.pop();
+              int b = operands.pop();
+              int a = operands.pop();
+
+              int ans = operation(a,b,operator);
+              operands.push(ans);
+
+            }
+        // System.out.println(operands.peek());
+          // int pow = 1, result = 0;
+          // while( operands.size() != 0){
+          //     result = result + operands.pop() * pow;
+          //     pow *=10;
+          // }
+          // operands.push(result);
+        return operands.peek();
+      }
+
     }
 
 }
